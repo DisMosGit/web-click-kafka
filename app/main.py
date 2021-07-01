@@ -30,3 +30,8 @@ app.add_middleware(
 @app.get("/health-check")
 async def health_check():
     return {"ok": True, "version": app.version}
+
+
+from app.events.routers import router as events
+
+app.include_router(events, prefix="/api")

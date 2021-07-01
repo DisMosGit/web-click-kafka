@@ -8,6 +8,10 @@ fastapi = "*"
 httpx = {extras = ["http2"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
 orjson = "*"
+jinjasql = "*"
+asynch = "*"
+confluent-kafka = "*"
+kafka-python = "*"
 
 [dev-packages]
 pytest-asyncio = "*"
