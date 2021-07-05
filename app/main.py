@@ -6,10 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Python",
-    debug=bool(os.environ.get('DEBUG')),
-    version=os.environ.get('APP_VERSION'),
+    debug=bool(os.environ.get("DEBUG")),
+    version=os.environ.get("APP_VERSION"),
     default_response_class=ORJSONResponse,
-    openapi_url=os.environ.get('SWAGGER_URL'),
+    openapi_url=os.environ.get("SWAGGER_URL"),
 )
 
 origins = [

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from app.main import app
 
 load_dotenv()
-load_dotenv(os.environ.get('ENV_NAME'))
+load_dotenv(os.environ.get("ENV_FILE"))
 
 
 @pytest.mark.asyncio
