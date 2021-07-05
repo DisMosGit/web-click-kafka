@@ -13,13 +13,12 @@ class ClickhouseTable:
     table_scheme: str
 
     @classmethod
-    @property
-    def sql(cls, template: str, data: dict) -> tuple:
-        return cls.j.prepare_query(template, data)
+    def sql(cls, template: str, data) -> tuple:
+        return cls.j.prepare_query(template, data=data)
 
     @classmethod
     @property
-    async def db(cls) -> connection.Connection:
+    async def conn(cls) -> connection.Connection:
         return await connect(
             host="127.0.0.1",
             port=9000,
@@ -30,8 +29,9 @@ class ClickhouseTable:
 
     @classmethod
     async def raw_execute(cls, query: str, args=None):
-        async with cls.db.cursor(cursor=cls.cursor) as cursor:
-            return await cursor.execute(query=query, args=args)
+        conn = await cls.conn
+        async with conn.cursor(cursor=cls.cursor) as cursor:
+            return await cursor.execute(query=query.replace("  ", ""), args=args)
 
     @classmethod
     async def execute(cls, template: str, data: dict = {}):
@@ -39,15 +39,27 @@ class ClickhouseTable:
 
     @classmethod
     async def init_table(cls):
-        async with cls.db.cursor(cursor=cls.cursor) as cursor:
+        conn = await cls.conn
+        async with conn.cursor(cursor=cls.cursor) as cursor:
             await cursor.execute(f"CREATE DATABASE IF NOT EXISTS {cls.db};")
 
     @classmethod
-    async def add(cls, values: list, defaults={}):
+    async def add(cls, defaults={}, **kwargs):
         template = f"INSERT INTO {cls.db}.{cls.table} (*) VALUES;"
-        return await cls.execute(template, defaults | {"values": values})
+        return await cls.execute(template, **kwargs, defaults=defaults)
 
     @classmethod
-    async def select(cls, find: dict, defaults={}):
+    async def select(cls, defaults={}, **kwargs):
         template = f"SELECT t.* {cls.db}.{cls.table} t;"
-        return await cls.execute(template, defaults | {"find": find})
+        return await cls.execute(template, **kwargs, defaults=defaults)
+
+
+def M(*args, **kwargs) -> dict:
+    """Join objects to dict"""
+    result = {}
+    for arg in args:
+        if isinstance(arg, dict):
+            result.update(arg)
+        if hasattr(arg, "__dict__"):
+            result.update(dict(arg))
+    return result | kwargs
