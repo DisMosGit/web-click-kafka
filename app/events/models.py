@@ -16,6 +16,20 @@ class ClickManager:
         duration: Optional[pydantic.PositiveInt]
         page: str
 
+        @classmethod
+        def generate(cls):
+            from random import choice, randint
+
+            pages = ("main", "index", "profile", "shop")
+            return cls(
+                x=randint(1, 12000),
+                y=randint(1, 12000),
+                window_x=randint(1, 12000),
+                window_y=randint(1, 12000),
+                duration=randint(1, 10000),
+                page=choice(pages),
+            )
+
     class ClickOut(pydantic.BaseModel):
         time: datetime
         x: pydantic.PositiveInt
